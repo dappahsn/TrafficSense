@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>TrafficSense</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- jquery -->
+  <script src="assets/jquery/jquery.min.js"></script>
+
+  <!-- Favicons -->
+  <link href="assets/img/logo-icon-3d.png" rel="icon">
+  <link href="assets/img/logo-icon-3d.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/apex-charts/apex-charts.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <script>
+  $(document).ready(function () {
+    let lastStatus = "";
+    let toastEl = document.getElementById("macetToast");
+    let toast = new bootstrap.Toast(toastEl);
+
+    setInterval(function () {
+      $.getJSON("nilai-sensor.php", function (data) {
+        $("#nilai").text(data.suara);
+        $(".status-text").text(data.status);
+        $(".status").css("background-color", data.warna);
+
+        // Ganti ikon
+        let iconClass = "";
+        if (data.status === "Lancar") {
+          iconClass = "bi-check-circle-fill";
+        } else if (data.status === "Sedang") {
+          iconClass = "bi-exclamation-circle-fill";
+        } else if (data.status === "Macet") {
+          iconClass = "bi-x-circle-fill";
+        }
+        $(".status-icon").attr("class", "bi " + iconClass + " status-icon");
+
+        // Tampilkan toast saat status berubah menjadi "Macet"
+        if (data.status === "Macet" && lastStatus !== "Macet") {
+          toast.show();
+        }
+
+        // Sembunyikan toast jika status bukan "Macet"
+        if (data.status !== "Macet" && lastStatus === "Macet") {
+          toast.hide();
+        }
+
+        lastStatus = data.status;
+      });
+    }, 500);
+  });
+  
+</script>
+
+
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="dashboard.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="assets/img/logo-3d.png" alt="">
+        <h1 class="sitename">TrafficSense</h1>
+      </a>
+
+
+
+    </div>
+  </header>
+
+  <main class="main">
+
+  <section style="padding-top:6rem;" id="features" class="features section">
+    <div class="container" style="display: flex; flex-direction: column;">
+      <div class="row gy-4">
+        <div class="features-image col-lg-6 order-lg-2" data-aos="fade-up" data-aos-delay="100">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1985.4800876578245!2d95.36234839975266!3d5.572906599046559!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304037b1e9b0fa93%3A0xe7fcc4dca5575e91!2sJl.%20Teuku%20Nyak%20Arief%2C%20Kopelma%20Darussalam%2C%20Kec.%20Syiah%20Kuala%2C%20Kota%20Banda%20Aceh%2C%20Aceh!5e0!3m2!1sid!2sid!4v1747144630405!5m2!1sid!2sid" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+          <div class="features-item d-flex ps-0 ps-lg-3 pt-4 pt-lg-0" data-aos="fade-up" data-aos-delay="200">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <h4>JL. T. Nyak Arief</h4>
+              <div class="traffic-status mt-2">
+                <p class="label mb-0">Tingkat Kepadatan:</p>
+                <span class="status d-flex align-items-center gap-2">
+                  <i style="font-size:large; color: black;" class="bi bi-check-circle-fill status-icon"></i>
+                  <span class="status-text">Lancar</span>
+                </span>
+            </div>
+
+            <div class="nilai-sensor mt-2">
+              <p class="label mb-0">Nilai Sensor:</p>
+              <span id="nilai" class="nilai">0</span><br>
+              <div id="growthChart"></div>
+          </div>
+                <!-- <a href="#" class="button">Lihat Detail</a> Tombol "Lihat Detail" -->
+            </div>
+          </div><!-- End Features Item-->
+        </div>
+      </div>
+    </div>
+
+    <!-- Garis Pembatas -->
+    <hr class="custom-divider">
+  </section><!-- /Features Section -->
+
+  <div style="width: 100%; margin: 0 auto; text-align: center; padding-bottom: 6rem;">
+    <canvas id="myChart"></canvas>
+  </div>
+
+
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+  <div id="macetToast" class="toast bg-danger text-white" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header bg-dark text-white">
+      <strong class="me-auto">TrafficSense</strong>
+      <small>Sekarang</small>
+      <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      🚨 Terjadi kemacetan di JL. T. Nyak Arief!
+    </div>
+  </div>
+</div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="assets/vendor/apex-charts/apexcharts.js"></script>
+  
+
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+  const ctx = document.getElementById('myChart').getContext('2d');
+  let myChart;
+
+  function fetchAndUpdateChart() {
+    fetch('data-chart.php')
+      .then(response => response.json())
+      .then(data => {
+        const labels = data.map(item => item.tanggal);
+        const values = data.map(item => item.rata_suara);
+
+        if (!myChart) {
+          // Buat chart pertama kali
+          myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Tingkat',
+                data: values,
+                backgroundColor: '#5b7aa6',
+                borderColor: '#5b7aa6',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Nilai Sensor'
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Tanggal'
+                  }
+                }
+              }
+            }
+          });
+        } else {
+          // Update chart jika sudah dibuat
+          myChart.data.labels = labels;
+          myChart.data.datasets[0].data = values;
+          myChart.update();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching chart data:', error);
+      });
+  }
+
+  // Panggil pertama kali
+  fetchAndUpdateChart();
+
+  // Auto refresh setiap 500ms
+  setInterval(fetchAndUpdateChart, 500);
+</script>
+
+
+
+
+
+
+</body>
+
+</html>
