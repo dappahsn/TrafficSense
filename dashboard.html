@@ -31,47 +31,6 @@
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
-  <script>
-  $(document).ready(function () {
-    let lastStatus = "";
-    let toastEl = document.getElementById("macetToast");
-    let toast = new bootstrap.Toast(toastEl);
-
-    setInterval(function () {
-      $.getJSON("nilai-sensor.php", function (data) {
-        $("#nilai").text(data.suara);
-        $(".status-text").text(data.status);
-        $(".status").css("background-color", data.warna);
-
-        // Ganti ikon
-        let iconClass = "";
-        if (data.status === "Lancar") {
-          iconClass = "bi-check-circle-fill";
-        } else if (data.status === "Sedang") {
-          iconClass = "bi-exclamation-circle-fill";
-        } else if (data.status === "Macet") {
-          iconClass = "bi-x-circle-fill";
-        }
-        $(".status-icon").attr("class", "bi " + iconClass + " status-icon");
-
-        // Tampilkan toast saat status berubah menjadi "Macet"
-        if (data.status === "Macet" && lastStatus !== "Macet") {
-          toast.show();
-        }
-
-        // Sembunyikan toast jika status bukan "Macet"
-        if (data.status !== "Macet" && lastStatus === "Macet") {
-          toast.hide();
-        }
-
-        lastStatus = data.status;
-      });
-    }, 500);
-  });
-  
-</script>
-
-
 </head>
 
 <body class="index-page">
@@ -167,19 +126,39 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-  const ctx = document.getElementById('myChart').getContext('2d');
-  let myChart;
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  function fetchAndUpdateChart() {
-    fetch('data-chart.php')
-      .then(response => response.json())
-      .then(data => {
+  <script>
+    $(document).ready(function () {
+      // Inisialisasi Firebase
+      const firebaseConfig = {
+        apiKey: "API_KEY_MU",
+        authDomain: "PROJECT_ID.firebaseapp.com",
+        projectId: "trafficsense1",
+        storageBucket: "PROJECT_ID.appspot.com",
+        messagingSenderId: "SENDER_ID",
+        appId: "APP_ID"
+      };
+  
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+  
+      let lastStatus = "";
+      let toastEl = document.getElementById("macetToast");
+      let toast = new bootstrap.Toast(toastEl);
+  
+      // Chart.js setup
+      const ctx = document.getElementById('myChart').getContext('2d');
+      let myChart = null;
+  
+      // Fungsi update chart
+      function updateChart(data) {
         const labels = data.map(item => item.tanggal);
         const values = data.map(item => item.rata_suara);
-
+  
         if (!myChart) {
-          // Buat chart pertama kali
           myChart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -212,29 +191,87 @@
             }
           });
         } else {
-          // Update chart jika sudah dibuat
           myChart.data.labels = labels;
           myChart.data.datasets[0].data = values;
           myChart.update();
         }
-      })
-      .catch(error => {
-        console.error('Error fetching chart data:', error);
-      });
-  }
-
-  // Panggil pertama kali
-  fetchAndUpdateChart();
-
-  // Auto refresh setiap 500ms
-  setInterval(fetchAndUpdateChart, 500);
-</script>
-
-
-
-
-
+      }
+  
+      // Fungsi untuk menentukan status dan warna berdasarkan nilai sensor
+      function getStatusAndColor(nilai) {
+        if (nilai <= 750) {
+          return { status: "Lancar", warna: "#b4ff9f" };
+        } else if (nilai <= 1500) {
+          return { status: "Sedang", warna: "#f9ffa4" };
+        } else {
+          return { status: "Padat", warna: "#ffa1a1" };
+        }
+      }
+  
+      // Fungsi update status suara dan toast dari Firestore
+      function listenRealtimeStatus() {
+        db.collection("sensor_suara").orderBy("timestamp", "desc").limit(1)
+          .onSnapshot(snapshot => {
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              const suara = data.nilai_suara ?? 0;
+  
+              // Tentukan status dan warna dari nilai sensor
+              const { status, warna } = getStatusAndColor(suara);
+  
+              $("#nilai").text(suara);
+              $(".status-text").text(status);
+              $(".status").css("background-color", warna);
+  
+              let iconClass = "";
+              if (status === "Lancar") iconClass = "bi-check-circle-fill";
+              else if (status === "Sedang") iconClass = "bi-exclamation-circle-fill";
+              else if (status === "Padat") iconClass = "bi-x-circle-fill";
+              $(".status-icon").attr("class", "bi " + iconClass + " status-icon");
+  
+              if (status === "Padat" && lastStatus !== "Padat") {
+                toast.show();
+              }
+              if (status !== "Padat" && lastStatus === "Padat") {
+                toast.hide();
+              }
+              lastStatus = status;
+            });
+          });
+      }
+  
+      // Fungsi update chart realtime
+      function listenRealtimeChart() {
+        db.collection("sensor_suara")
+          .orderBy("timestamp", "desc")
+          .limit(10)
+          .onSnapshot(snapshot => {
+            let data = [];
+            snapshot.forEach(doc => {
+              const d = doc.data();
+              let timeLabel = "";
+              if (d.timestamp && d.timestamp.toDate) {
+                timeLabel = d.timestamp.toDate().toLocaleString("id-ID");
+              } else {
+                timeLabel = new Date().toLocaleString("id-ID");
+              }
+              data.push({
+                rata_suara: d.nilai_suara ?? 0,
+                tanggal: timeLabel
+              });
+            });
+            // reverse supaya tanggal lama di kiri
+            updateChart(data.reverse());
+          });
+      }
+  
+      // Mulai listen realtime
+      listenRealtimeStatus();
+      listenRealtimeChart();
+  
+    });
+  </script>
+  
 
 </body>
-
 </html>
