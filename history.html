@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Riwayat - TrafficSense</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <link href="assets/img/logo-icon-3d.png" rel="icon">
+  <link href="assets/img/logo-icon-3d.png" rel="apple-touch-icon">
+
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    .history.section {
+      padding-top: 100px; /* Adjust padding to clear fixed header */
+    }
+    .card-history.active {
+      background-color: #f8d7da; /* Bootstrap's light red */
+      border-color: #f5c2c7;
+    }
+    .card-history.completed {
+      background-color: #e2e3e5; /* Bootstrap's light gray */
+      border-color: #d3d6d8;
+    }
+    .card-history.completed .card-title,
+    .card-history.completed .card-text {
+      color: #6c757d; /* Muted text color */
+      text-decoration: line-through;
+    }
+    .btn-selesai {
+      background-color: #198754; /* Bootstrap's success green */
+      color: white;
+    }
+    .btn-hapus {
+      background-color: #dc3545; /* Bootstrap's danger red */
+      color: white;
+    }
+  </style>
+
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="assets/img/logo-3d.png" alt="">
+        <h1 class="sitename">TrafficSense</h1>
+      </a>
+      </div>
+  </header>
+
+  <main class="main">
+
+    <section id="history" class="history section">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>Riwayat Sensor Suara</h2>
+          <p>Daftar rekaman data kebisingan yang terdeteksi.</p>
+        </div>
+        
+        <div id="history-list">
+          <p class="text-center">Memuat data riwayat...</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <div id="preloader"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <script src="assets/js/main.js"></script>
+
+  <script>
+    // Konfigurasi Firebase Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5PfdjWUN0ML8MhgW0xpVK8S6X4rcvaaM",
+      authDomain: "trafficsense1.firebaseapp.com",
+      databaseURL: "https://trafficsense1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "trafficsense1",
+      storageBucket: "trafficsense1.appspot.com",
+      messagingSenderId: "516881771916",
+      appId: "1:516881771916:web:aeab5a356a650bc061baa9",
+      measurementId: "G-T60K6VS98F"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const historyList = document.getElementById('history-list');
+
+    // Fungsi untuk mengambil ID yang sudah ditandai 'selesai' dari localStorage
+    const getCompletedIds = () => {
+      const data = localStorage.getItem("completedSoundIds");
+      return data ? JSON.parse(data) : [];
+    };
+
+    // Fungsi untuk menyimpan ID ke localStorage
+    const saveCompletedIds = (ids) => {
+      localStorage.setItem("completedSoundIds", JSON.stringify(ids));
+    };
+    
+    // **PENTING:** Ganti 'sensor_suara' dengan nama node/path di Realtime Database Anda
+    const historyRef = database.ref('sensor_suara'); 
+
+    historyRef.orderByChild('timestamp').on('value', (snapshot) => {
+      historyList.innerHTML = ''; // Kosongkan daftar sebelum mengisi ulang
+      const completedIds = getCompletedIds();
+      let records = [];
+
+      if (!snapshot.exists()) {
+        historyList.innerHTML = "<p class='text-center'>Tidak ada riwayat deteksi suara.</p>";
+        return;
+      }
+
+      // Snapshot dari Realtime DB perlu diiterasi seperti ini
+      snapshot.forEach(childSnapshot => {
+        const docId = childSnapshot.key;
+        const data = childSnapshot.val();
+        records.push({ id: docId, ...data });
+      });
+      
+      // Balik urutan array agar data terbaru ada di paling atas
+      records.reverse();
+
+      records.forEach(record => {
+        const time = new Date(record.timestamp).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short'});
+        const soundValue = record.sensor_suara ?? 'N/A';
+        const isCompleted = completedIds.includes(record.id);
+
+        const card = document.createElement('div');
+        card.className = `card card-history mb-3 ${isCompleted ? 'completed' : 'active'}`;
+        card.id = `card-${record.id}`;
+
+        card.innerHTML = `
+          <div class="card-body">
+            <h5 class="card-title">Deteksi Suara</h5>
+            <p class="card-text mb-1"><strong>Waktu:</strong> ${time}</p>
+            <p class="card-text"><strong>Nilai Sensor Suara:</strong> ${soundValue} dB</p>
+            ${!isCompleted ? `<button class="btn btn-sm btn-selesai" data-id="${record.id}">Tandai Selesai</button>` : ''}
+            <button class="btn btn-sm btn-hapus mt-2 mt-md-0" data-id="${record.id}">Hapus</button>
+          </div>
+        `;
+        historyList.appendChild(card);
+      });
+      
+      // Tambahkan event listener untuk semua tombol 'Selesai'
+      document.querySelectorAll('.btn-selesai').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          let ids = getCompletedIds();
+          if (!ids.includes(id)) {
+            ids.push(id);
+            saveCompletedIds(ids);
+            
+            // Perbarui tampilan card
+            const card = document.getElementById(`card-${id}`);
+            card.classList.remove('active');
+            card.classList.add('completed');
+            this.remove(); // Hapus tombol 'Selesai'
+          }
+        });
+      });
+
+      // Tambahkan event listener untuk semua tombol 'Hapus'
+      document.querySelectorAll('.btn-hapus').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const id = this.getAttribute('data-id');
+          if (confirm('Apakah Anda yakin ingin menghapus riwayat ini secara permanen?')) {
+            // Hapus dari Firebase Database
+            database.ref('sensor_suara/' + id).remove()
+              .then(() => {
+                console.log("Data berhasil dihapus dari Firebase.");
+                // Hapus juga dari localStorage jika ada
+                let ids = getCompletedIds();
+                const index = ids.indexOf(id);
+                if (index > -1) {
+                  ids.splice(index, 1);
+                  saveCompletedIds(ids);
+                }
+              })
+              .catch((error) => {
+                console.error("Gagal menghapus data: ", error);
+              });
+          }
+        });
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>

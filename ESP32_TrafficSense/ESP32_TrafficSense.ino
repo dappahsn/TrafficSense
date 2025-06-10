@@ -3,8 +3,8 @@
 #include "time.h"
 
 // Ganti dengan WiFi kamu
-const char* ssid = "ruryaw";
-const char* password = "anakhusen";
+const char* ssid = "luhkibo";
+const char* password = "luhgangg";
 
 // Firestore
 const String projectId = "trafficsense1";

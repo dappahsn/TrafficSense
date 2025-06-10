@@ -526,3 +526,15 @@ section,
   margin: 4rem auto 0 auto;
   width: 90%;
 }
+
+.history .table thead th {
+  font-weight: 600;
+  color: #3c4858;
+}
+.history .card-header {
+  background: linear-gradient(60deg, #608BB7, #608BB7);
+}
+
+.history .card-header h4{
+  font-weight: 600;
+}

@@ -8,28 +8,49 @@
   <meta name="description" content="">
   <meta name="keywords" content="">
 
-  <!-- jquery -->
   <script src="assets/jquery/jquery.min.js"></script>
 
-  <!-- Favicons -->
   <link href="assets/img/logo-icon-3d.png" rel="icon">
   <link href="assets/img/logo-icon-3d.png" rel="apple-touch-icon">
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
-  <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-  <link href="assets/vendor/apex-charts/apex-charts.css" rel="stylesheet">
 
-  <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    .history-card.status-lancar {
+      background-color: #d1e7dd;
+      border-left: 5px solid #0f5132;
+    }
+    .history-card.status-sedang {
+      background-color: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+    .history-card.status-padat {
+      background-color: #f8d7da;
+      border-left: 5px solid #dc3545;
+    }
+    .history-card .card-title {
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+    }
+    .history-card .card-subtitle {
+      font-size: 0.9rem;
+    }
+    .history-card .sensor-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #333;
+    }
+  </style>
 
 </head>
 
@@ -43,8 +64,6 @@
         <h1 class="sitename">TrafficSense</h1>
       </a>
 
-
-
     </div>
   </header>
 
@@ -54,7 +73,7 @@
     <div class="container" style="display: flex; flex-direction: column;">
       <div class="row gy-4">
         <div class="features-image col-lg-6 order-lg-2" data-aos="fade-up" data-aos-delay="100">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1985.4800876578245!2d95.36234839975266!3d5.572906599046559!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304037b1e9b0fa93%3A0xe7fcc4dca5575e91!2sJl.%20Teuku%20Nyak%20Arief%2C%20Kopelma%20Darussalam%2C%20Kec.%20Syiah%20Kuala%2C%20Kota%20Banda%20Aceh%2C%20Aceh!5e0!3m2!1sid!2sid!4v1747144630405!5m2!1sid!2sid" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.095598170209!2d95.34212957474411!3d5.54924199440315!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30403713d8c1cbf5%3A0x6a9437a445c786ca!2sJl.%20Teuku%20Nyak%20Arief%2C%20Kopelma%20Darussalam%2C%20Kec.%20Syiah%20Kuala%2C%20Kota%20Banda%20Aceh%2C%20Aceh!5e0!3m2!1sid!2sid!4v1717843477810!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
         <div class="col-lg-6 order-lg-1">
           <div class="features-item d-flex ps-0 ps-lg-3 pt-4 pt-lg-0" data-aos="fade-up" data-aos-delay="200">
@@ -62,216 +81,228 @@
               <h4>JL. T. Nyak Arief</h4>
               <div class="traffic-status mt-2">
                 <p class="label mb-0">Tingkat Kepadatan:</p>
-                <span class="status d-flex align-items-center gap-2">
-                  <i style="font-size:large; color: black;" class="bi bi-check-circle-fill status-icon"></i>
-                  <span class="status-text">Lancar</span>
+                <span id="traffic-status-container" class="status d-flex align-items-center gap-2">
+                  <i style="font-size:large;" class="bi bi-arrow-down-up status-icon"></i>
+                  <span class="status-text">Memuat...</span>
                 </span>
-            </div>
+              </div>
 
-            <div class="nilai-sensor mt-2">
-              <p class="label mb-0">Nilai Sensor:</p>
-              <span id="nilai" class="nilai">0</span><br>
-              <div id="growthChart"></div>
-          </div>
-                <!-- <a href="#" class="button">Lihat Detail</a> Tombol "Lihat Detail" -->
+              <div class="nilai-sensor mt-2">
+                <p class="label mb-0">Nilai Sensor:</p>
+                <span id="nilai" class="nilai">0</span><br>
+              </div>
+                <a href="detail.html" class="button">Lihat Detail</a>
             </div>
-          </div><!-- End Features Item-->
-        </div>
+          </div></div>
       </div>
     </div>
+  </section>
+  
+  <section id="daily-history" class="daily-history section pt-0">
+    <div class="container" data-aos="fade-up">
+  
+      <div class="section-title text-center">
+        <h2>Riwayat Data Harian</h2>
+        <p>Rata-rata tingkat kepadatan lalu lintas per hari.</p>
+      </div>
+  
+      <div id="daily-history-container" class="row gy-4">
+        <div class="col-12 text-center">
+          <p>Memuat riwayat data...</p>
+        </div>
+      </div>
+  
+    </div>
+  </section>
+  <hr class="custom-divider">
 
-    <!-- Garis Pembatas -->
-    <hr class="custom-divider">
-  </section><!-- /Features Section -->
-
-  <div style="width: 100%; margin: 0 auto; text-align: center; padding-bottom: 6rem;">
-    <canvas id="myChart"></canvas>
+  <div style="width: 80%; margin: 0 auto; text-align: center; padding-bottom: 6rem;">
   </div>
 
+  </main>
 
-
-  <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-  <!-- Preloader -->
   <div id="preloader"></div>
 
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
-  <div id="macetToast" class="toast bg-danger text-white" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header bg-dark text-white">
-      <strong class="me-auto">TrafficSense</strong>
-      <small>Sekarang</small>
-      <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-      🚨 Terjadi kemacetan di JL. T. Nyak Arief!
+    <div id="macetToast" class="toast bg-danger text-white" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header bg-dark text-white">
+        <strong class="me-auto">TrafficSense</strong>
+        <small>Sekarang</small>
+        <button type="button" class="btn-close btn-close-white ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        🚨 Terjadi kemacetan di JL. T. Nyak Arief!
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
   <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="assets/vendor/apex-charts/apexcharts.js"></script>
-  
 
-
-  <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Firebase SDK -->
+  
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    $(document).ready(function () {
-      // Inisialisasi Firebase
-      const firebaseConfig = {
-        apiKey: "API_KEY_MU",
-        authDomain: "PROJECT_ID.firebaseapp.com",
-        projectId: "trafficsense1",
-        storageBucket: "PROJECT_ID.appspot.com",
-        messagingSenderId: "SENDER_ID",
-        appId: "APP_ID"
-      };
+    // Konfigurasi Firebase Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5PfdjWUN0ML8MhgW0xpVK8S6X4rcvaaM",
+      authDomain: "trafficsense1.firebaseapp.com",
+      databaseURL: "https://trafficsense1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "trafficsense1",
+      storageBucket: "trafficsense1.appspot.com",
+      messagingSenderId: "516881771916",
+      appId: "1:516881771916:web:aeab5a356a650bc061baa9",
+      measurementId: "G-T60K6VS98F"
+    };
   
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
   
-      let lastStatus = "";
-      let toastEl = document.getElementById("macetToast");
-      let toast = new bootstrap.Toast(toastEl);
+    // === BAGIAN 1: PEMBARUAN DATA & STATUS REAL-TIME ===
+    const nilaiElement = document.getElementById('nilai');
+    const statusTextElement = document.querySelector('.status-text');
+    const statusIconElement = document.querySelector('.status-icon');
+    const statusContainerElement = document.getElementById('traffic-status-container');
+    const macetToast = new bootstrap.Toast(document.getElementById('macetToast'));
   
-      // Chart.js setup
-      const ctx = document.getElementById('myChart').getContext('2d');
-      let myChart = null;
   
-      // Fungsi update chart
-      function updateChart(data) {
-        const labels = data.map(item => item.tanggal);
-        const values = data.map(item => item.rata_suara);
+    // Ambil data terbaru dari koleksi 'sensor_suara'
+    db.collection("sensor_suara").orderBy("timestamp", "desc").limit(1)
+      .onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added" || change.type === "modified") {
+            const data = change.doc.data();
+            const nilaiSuara = data.nilai_suara;
   
-        if (!myChart) {
-          myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Tingkat',
-                data: values,
-                backgroundColor: '#5b7aa6',
-                borderColor: '#5b7aa6',
-                borderWidth: 1
-              }]
-            },
-            options: {
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  title: {
-                    display: true,
-                    text: 'Nilai Sensor'
-                  }
-                },
-                x: {
-                  title: {
-                    display: true,
-                    text: 'Tanggal'
-                  }
-                }
-              }
+            nilaiElement.textContent = nilaiSuara;
+  
+            if (nilaiSuara < 750) {
+              statusTextElement.textContent = 'Lancar';
+              statusContainerElement.style.color = '#0f5132';
+              statusContainerElement.style.backgroundColor = '#b4ff9f';
+              statusIconElement.className = 'bi bi-check-circle-fill status-icon';
+            } else if (nilaiSuara <= 1500) {
+              statusTextElement.textContent = 'Sedang';
+              statusContainerElement.style.color = '#664d03';
+              statusContainerElement.style.backgroundColor = '#f9ffa4';
+              statusIconElement.className = 'bi bi-exclamation-circle-fill status-icon';
+            } else {
+              statusTextElement.textContent = 'Padat';
+              statusContainerElement.style.color = '#58151c';
+              statusContainerElement.style.backgroundColor = '#ffa1a1';
+              statusIconElement.className = 'bi bi-x-circle-fill status-icon';
+              macetToast.show();
             }
-          });
-        } else {
-          myChart.data.labels = labels;
-          myChart.data.datasets[0].data = values;
-          myChart.update();
+          }
+        });
+      }, (error) => {
+        console.error("Error pada listener real-time: ", error);
+      });
+  
+    // === BAGIAN 2: PEMBUATAN RIWAYAT DATA HARIAN ===
+  
+    // Fungsi untuk mendapatkan info status (teks dan kelas CSS) berdasarkan nilai
+    function getStatusInfo(nilai) {
+      if (nilai < 750) {
+        return { text: 'Lancar', className: 'status-lancar' };
+      } else if (nilai <= 1500) {
+        return { text: 'Sedang', className: 'status-sedang' };
+      } else {
+        return { text: 'Padat', className: 'status-padat' };
+      }
+    }
+  
+    // Fungsi utama untuk mengambil data, memproses, dan menampilkan riwayat
+    async function generateDailyHistory() {
+      const historyContainer = document.getElementById('daily-history-container');
+      try {
+        // 1. Ambil semua data dari koleksi sensor_suara
+        const snapshot = await db.collection("sensor_suara").orderBy("timestamp", "desc").get();
+        
+        if (snapshot.empty) {
+          historyContainer.innerHTML = '<p class="text-center">Belum ada riwayat data.</p>';
+          return;
         }
-      }
   
-      // Fungsi untuk menentukan status dan warna berdasarkan nilai sensor
-      function getStatusAndColor(nilai) {
-        if (nilai <= 750) {
-          return { status: "Lancar", warna: "#b4ff9f" };
-        } else if (nilai <= 1500) {
-          return { status: "Sedang", warna: "#f9ffa4" };
-        } else {
-          return { status: "Padat", warna: "#ffa1a1" };
+        const dailyData = {}; // Objek untuk mengelompokkan data per hari
+  
+        // 2. Kelompokkan data berdasarkan tanggal
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const timestamp = new Date(data.timestamp);
+          const dateString = timestamp.toISOString().split('T')[0];
+  
+          if (!dailyData[dateString]) {
+            dailyData[dateString] = {
+              sum: 0,
+              count: 0,
+              date: timestamp
+            };
+          }
+          dailyData[dateString].sum += data.nilai_suara;
+          dailyData[dateString].count += 1;
+        });
+  
+        // 3. Buat HTML untuk setiap hari
+        let historyHtml = '';
+        for (const dateKey in dailyData) {
+          const day = dailyData[dateKey];
+          const average = Math.round(day.sum / day.count);
+          const status = getStatusInfo(average);
+          
+          const formattedDate = day.date.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+  
+          historyHtml += `
+            <div class="col-lg-4 col-md-6">
+              <div class="card history-card ${status.className}">
+                <div class="card-body">
+                  <h5 class="card-title">${status.text}</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">${formattedDate}</h6>
+                  <p class="card-text mb-0">Rata-rata Nilai Sensor:</p>
+                  <p class="sensor-value">${average}</p>
+                </div>
+              </div>
+            </div>
+          `;
         }
+        
+        // 4. Tampilkan kartu ke dalam container
+        historyContainer.innerHTML = historyHtml;
+  
+      } catch (error) {
+        console.error("Error saat membuat riwayat harian: ", error);
+        historyContainer.innerHTML = '<p class="text-center text-danger">Gagal memuat riwayat data.</p>';
       }
+    }
   
-      // Fungsi update status suara dan toast dari Firestore
-      function listenRealtimeStatus() {
-        db.collection("sensor_suara").orderBy("timestamp", "desc").limit(1)
-          .onSnapshot(snapshot => {
-            snapshot.forEach(doc => {
-              const data = doc.data();
-              const suara = data.nilai_suara ?? 0;
+    // === BAGIAN 3: PEMANGGILAN FUNGSI OTOMATIS (MODIFIKASI DI SINI) ===
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Panggil fungsi sekali agar riwayat langsung tampil saat halaman dimuat
+      console.log('Memuat riwayat data awal...');
+      generateDailyHistory();
   
-              // Tentukan status dan warna dari nilai sensor
-              const { status, warna } = getStatusAndColor(suara);
-  
-              $("#nilai").text(suara);
-              $(".status-text").text(status);
-              $(".status").css("background-color", warna);
-  
-              let iconClass = "";
-              if (status === "Lancar") iconClass = "bi-check-circle-fill";
-              else if (status === "Sedang") iconClass = "bi-exclamation-circle-fill";
-              else if (status === "Padat") iconClass = "bi-x-circle-fill";
-              $(".status-icon").attr("class", "bi " + iconClass + " status-icon");
-  
-              if (status === "Padat" && lastStatus !== "Padat") {
-                toast.show();
-              }
-              if (status !== "Padat" && lastStatus === "Padat") {
-                toast.hide();
-              }
-              lastStatus = status;
-            });
-          });
-      }
-  
-      // Fungsi update chart realtime
-      function listenRealtimeChart() {
-        db.collection("sensor_suara")
-          .orderBy("timestamp", "desc")
-          .limit(10)
-          .onSnapshot(snapshot => {
-            let data = [];
-            snapshot.forEach(doc => {
-              const d = doc.data();
-              let timeLabel = "";
-              if (d.timestamp && d.timestamp.toDate) {
-                timeLabel = d.timestamp.toDate().toLocaleString("id-ID");
-              } else {
-                timeLabel = new Date().toLocaleString("id-ID");
-              }
-              data.push({
-                rata_suara: d.nilai_suara ?? 0,
-                tanggal: timeLabel
-              });
-            });
-            // reverse supaya tanggal lama di kiri
-            updateChart(data.reverse());
-          });
-      }
-  
-      // Mulai listen realtime
-      listenRealtimeStatus();
-      listenRealtimeChart();
-  
+      // 2. Atur interval untuk memanggil fungsi yang sama setiap 5 detik (5000 milidetik)
+      console.log('Mengatur refresh otomatis setiap 5 detik untuk riwayat.');
+      setInterval(generateDailyHistory, 5000);
     });
-  </script>
   
+  </script>
+  </body>
 
-</body>
 </html>
