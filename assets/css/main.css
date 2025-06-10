@@ -527,14 +527,27 @@ section,
   width: 90%;
 }
 
-.history .table thead th {
-  font-weight: 600;
-  color: #3c4858;
+.history-card.status-lancar {
+  background-color: #d1e7dd;
+  border-left: 5px solid #0f5132;
 }
-.history .card-header {
-  background: linear-gradient(60deg, #608BB7, #608BB7);
+.history-card.status-sedang {
+  background-color: #fff3cd;
+  border-left: 5px solid #ffc107;
 }
-
-.history .card-header h4{
+.history-card.status-padat {
+  background-color: #f8d7da;
+  border-left: 5px solid #dc3545;
+}
+.history-card .card-title {
   font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+.history-card .card-subtitle {
+  font-size: 0.9rem;
+}
+.history-card .sensor-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
 }

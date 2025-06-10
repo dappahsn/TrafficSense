@@ -97,13 +97,19 @@
       </div>
     </div>
   </section>
+
+  <hr class="custom-divider">
+
+  <div style="width: 80%; margin: 0 auto; text-align: center; padding-bottom: 6rem;">
+  </div>
+
   
   <section id="daily-history" class="daily-history section pt-0">
     <div class="container" data-aos="fade-up">
   
       <div class="section-title text-center">
-        <h2>Riwayat Data Harian</h2>
-        <p>Rata-rata tingkat kepadatan lalu lintas per hari.</p>
+        <h2>Riwayat Kepadatan Lalu Lintas</h2>
+        <p>Rata-rata tingkat kepadatan lalu lintas per hari</p>
       </div>
   
       <div id="daily-history-container" class="row gy-4">
@@ -114,10 +120,6 @@
   
     </div>
   </section>
-  <hr class="custom-divider">
-
-  <div style="width: 80%; margin: 0 auto; text-align: center; padding-bottom: 6rem;">
-  </div>
 
   </main>
 
@@ -151,157 +153,167 @@
   
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <script>
-    // Konfigurasi Firebase Anda
-    const firebaseConfig = {
-      apiKey: "AIzaSyA5PfdjWUN0ML8MhgW0xpVK8S6X4rcvaaM",
-      authDomain: "trafficsense1.firebaseapp.com",
-      databaseURL: "https://trafficsense1-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "trafficsense1",
-      storageBucket: "trafficsense1.appspot.com",
-      messagingSenderId: "516881771916",
-      appId: "1:516881771916:web:aeab5a356a650bc061baa9",
-      measurementId: "G-T60K6VS98F"
-    };
-  
-    // Inisialisasi Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  
-    // === BAGIAN 1: PEMBARUAN DATA & STATUS REAL-TIME ===
-    const nilaiElement = document.getElementById('nilai');
-    const statusTextElement = document.querySelector('.status-text');
-    const statusIconElement = document.querySelector('.status-icon');
-    const statusContainerElement = document.getElementById('traffic-status-container');
-    const macetToast = new bootstrap.Toast(document.getElementById('macetToast'));
-  
-  
-    // Ambil data terbaru dari koleksi 'sensor_suara'
-    db.collection("sensor_suara").orderBy("timestamp", "desc").limit(1)
-      .onSnapshot((snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added" || change.type === "modified") {
-            const data = change.doc.data();
-            const nilaiSuara = data.nilai_suara;
-  
-            nilaiElement.textContent = nilaiSuara;
-  
-            if (nilaiSuara < 750) {
-              statusTextElement.textContent = 'Lancar';
-              statusContainerElement.style.color = '#0f5132';
-              statusContainerElement.style.backgroundColor = '#b4ff9f';
-              statusIconElement.className = 'bi bi-check-circle-fill status-icon';
-            } else if (nilaiSuara <= 1500) {
-              statusTextElement.textContent = 'Sedang';
-              statusContainerElement.style.color = '#664d03';
-              statusContainerElement.style.backgroundColor = '#f9ffa4';
-              statusIconElement.className = 'bi bi-exclamation-circle-fill status-icon';
-            } else {
-              statusTextElement.textContent = 'Padat';
-              statusContainerElement.style.color = '#58151c';
-              statusContainerElement.style.backgroundColor = '#ffa1a1';
-              statusIconElement.className = 'bi bi-x-circle-fill status-icon';
-              macetToast.show();
-            }
+  // Konfigurasi Firebase Anda
+  const firebaseConfig = {
+    apiKey: "AIzaSyA5PfdjWUN0ML8MhgW0xpVK8S6X4rcvaaM",
+    authDomain: "trafficsense1.firebaseapp.com",
+    databaseURL: "https://trafficsense1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "trafficsense1",
+    storageBucket: "trafficsense1.appspot.com",
+    messagingSenderId: "516881771916",
+    appId: "1:516881771916:web:aeab5a356a650bc061baa9",
+    measurementId: "G-T60K6VS98F"
+  };
+
+  // Inisialisasi Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // === BAGIAN 1: PEMBARUAN DATA & STATUS REAL-TIME ===
+  const nilaiElement = document.getElementById('nilai');
+  const statusTextElement = document.querySelector('.status-text');
+  const statusIconElement = document.querySelector('.status-icon');
+  const statusContainerElement = document.getElementById('traffic-status-container');
+  const macetToast = new bootstrap.Toast(document.getElementById('macetToast'));
+
+
+  // Ambil data terbaru dari koleksi 'sensor_suara'
+  db.collection("sensor_suara").orderBy("timestamp", "desc").limit(1)
+    .onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added" || change.type === "modified") {
+          const data = change.doc.data();
+          const nilaiSuara = data.nilai_suara;
+
+          nilaiElement.textContent = nilaiSuara;
+
+          if (nilaiSuara < 750) {
+            statusTextElement.textContent = 'Lancar';
+            statusContainerElement.style.color = '#0f5132';
+            statusContainerElement.style.backgroundColor = '#b4ff9f';
+            statusIconElement.className = 'bi bi-check-circle-fill status-icon';
+          } else if (nilaiSuara <= 1500) {
+            statusTextElement.textContent = 'Sedang';
+            statusContainerElement.style.color = '#664d03';
+            statusContainerElement.style.backgroundColor = '#f9ffa4';
+            statusIconElement.className = 'bi bi-exclamation-circle-fill status-icon';
+          } else {
+            statusTextElement.textContent = 'Padat';
+            statusContainerElement.style.color = '#58151c';
+            statusContainerElement.style.backgroundColor = '#ffa1a1';
+            statusIconElement.className = 'bi bi-x-circle-fill status-icon';
+            macetToast.show();
           }
-        });
-      }, (error) => {
-        console.error("Error pada listener real-time: ", error);
-      });
-  
-    // === BAGIAN 2: PEMBUATAN RIWAYAT DATA HARIAN ===
-  
-    // Fungsi untuk mendapatkan info status (teks dan kelas CSS) berdasarkan nilai
-    function getStatusInfo(nilai) {
-      if (nilai < 750) {
-        return { text: 'Lancar', className: 'status-lancar' };
-      } else if (nilai <= 1500) {
-        return { text: 'Sedang', className: 'status-sedang' };
-      } else {
-        return { text: 'Padat', className: 'status-padat' };
-      }
-    }
-  
-    // Fungsi utama untuk mengambil data, memproses, dan menampilkan riwayat
-    async function generateDailyHistory() {
-      const historyContainer = document.getElementById('daily-history-container');
-      try {
-        // 1. Ambil semua data dari koleksi sensor_suara
-        const snapshot = await db.collection("sensor_suara").orderBy("timestamp", "desc").get();
-        
-        if (snapshot.empty) {
-          historyContainer.innerHTML = '<p class="text-center">Belum ada riwayat data.</p>';
-          return;
         }
-  
-        const dailyData = {}; // Objek untuk mengelompokkan data per hari
-  
-        // 2. Kelompokkan data berdasarkan tanggal
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const timestamp = new Date(data.timestamp);
-          const dateString = timestamp.toISOString().split('T')[0];
-  
+      });
+    }, (error) => {
+      console.error("Error pada listener real-time: ", error);
+    });
+
+  // === BAGIAN 2: PEMBUATAN RIWAYAT DATA HARIAN ===
+
+  // Fungsi untuk mendapatkan info status (teks dan kelas CSS) berdasarkan nilai
+  function getStatusInfo(nilai) {
+    if (nilai < 750) {
+      return { text: 'Lancar', className: 'status-lancar' };
+    } else if (nilai <= 1500) {
+      return { text: 'Sedang', className: 'status-sedang' };
+    } else {
+      return { text: 'Padat', className: 'status-padat' };
+    }
+  }
+
+  // Fungsi utama untuk mengambil data, memproses, dan menampilkan riwayat
+  async function generateDailyHistory() {
+    const historyContainer = document.getElementById('daily-history-container');
+    try {
+      // 1. Ambil semua data dari koleksi sensor_suara
+      const snapshot = await db.collection("sensor_suara").orderBy("timestamp", "desc").get();
+      
+      if (snapshot.empty) {
+        historyContainer.innerHTML = '<p class="text-center">Belum ada riwayat data.</p>';
+        return;
+      }
+
+      const dailyData = {}; // Objek untuk mengelompokkan data per hari
+
+      // 2. Kelompokkan data berdasarkan tanggal
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        
+        if (data.timestamp && typeof data.nilai_suara !== 'undefined') {
+          
+          const timestamp = new Date(data.timestamp); 
+          
+          if (isNaN(timestamp.getTime())) {
+            console.warn("Melewati dokumen karena format string tanggal tidak valid:", doc.id, data.timestamp);
+            return; 
+          }
+
+          // Perbaikan untuk menangani zona waktu lokal dengan benar
+          const year = timestamp.getFullYear();
+          const month = String(timestamp.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0, jadi +1
+          const day = String(timestamp.getDate()).padStart(2, '0');
+          const dateString = `${year}-${month}-${day}`;
+          
           if (!dailyData[dateString]) {
-            dailyData[dateString] = {
-              sum: 0,
-              count: 0,
-              date: timestamp
-            };
+            dailyData[dateString] = { sum: 0, count: 0, date: timestamp };
           }
           dailyData[dateString].sum += data.nilai_suara;
           dailyData[dateString].count += 1;
+        }
+      });
+
+      // 3. Buat HTML untuk setiap hari
+      let historyHtml = '';
+      const sortedDates = Object.keys(dailyData).sort().reverse();
+
+      for (const dateKey of sortedDates) {
+        const day = dailyData[dateKey];
+        const average = Math.round(day.sum / day.count);
+        const status = getStatusInfo(average);
+        
+        const formattedDate = day.date.toLocaleDateString('id-ID', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         });
-  
-        // 3. Buat HTML untuk setiap hari
-        let historyHtml = '';
-        for (const dateKey in dailyData) {
-          const day = dailyData[dateKey];
-          const average = Math.round(day.sum / day.count);
-          const status = getStatusInfo(average);
-          
-          const formattedDate = day.date.toLocaleDateString('id-ID', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          });
-  
-          historyHtml += `
-            <div class="col-lg-4 col-md-6">
-              <div class="card history-card ${status.className}">
-                <div class="card-body">
-                  <h5 class="card-title">${status.text}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">${formattedDate}</h6>
-                  <p class="card-text mb-0">Rata-rata Nilai Sensor:</p>
-                  <p class="sensor-value">${average}</p>
-                </div>
+
+        historyHtml += `
+          <div class="col-lg-4 col-md-6">
+            <div class="card history-card ${status.className}">
+              <div class="card-body">
+                <h5 class="card-title">${status.text}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">${formattedDate}</h6>
+                <p class="card-text mb-0">Rata-rata Nilai Sensor:</p>
+                <p class="sensor-value">${average}</p>
               </div>
             </div>
-          `;
-        }
-        
-        // 4. Tampilkan kartu ke dalam container
-        historyContainer.innerHTML = historyHtml;
-  
-      } catch (error) {
-        console.error("Error saat membuat riwayat harian: ", error);
-        historyContainer.innerHTML = '<p class="text-center text-danger">Gagal memuat riwayat data.</p>';
+          </div>
+        `;
       }
+      
+      // 4. Tampilkan kartu ke dalam container
+      historyContainer.innerHTML = historyHtml;
+
+    } catch (error) {
+      console.error("Error saat membuat riwayat harian: ", error);
+      historyContainer.innerHTML = '<p class="text-center text-danger">Gagal memuat riwayat data. Periksa konsol (F12).</p>';
     }
-  
-    // === BAGIAN 3: PEMANGGILAN FUNGSI OTOMATIS (MODIFIKASI DI SINI) ===
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1. Panggil fungsi sekali agar riwayat langsung tampil saat halaman dimuat
-      console.log('Memuat riwayat data awal...');
-      generateDailyHistory();
-  
-      // 2. Atur interval untuk memanggil fungsi yang sama setiap 5 detik (5000 milidetik)
-      console.log('Mengatur refresh otomatis setiap 5 detik untuk riwayat.');
-      setInterval(generateDailyHistory, 5000);
-    });
-  
+  }
+
+  // === BAGIAN 3: PEMANGGILAN FUNGSI OTOMATIS ===
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Panggil fungsi sekali agar riwayat langsung tampil saat halaman dimuat
+    console.log('Memuat riwayat data awal...');
+    generateDailyHistory();
+
+    // 2. Atur interval untuk memanggil fungsi yang sama setiap 5 detik (5000 milidetik)
+    console.log('Mengatur refresh otomatis setiap 5 detik untuk riwayat.');
+    setInterval(generateDailyHistory, 5000);
+  });
   </script>
   </body>
 
